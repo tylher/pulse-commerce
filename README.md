@@ -152,3 +152,75 @@ cd pulse-commerce
 ```bash
 cd backend
 ./mvnw spring-boot:run
+```
+---
+
+### Run Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+---
+### 🐳 Docker (Planned)
+```bash
+docker-compose up --build
+```
+---
+### ☸ Kubernetes (Planned)
+```bash
+kubectl apply -f k8s/
+```
+---
+## 📈 Learning Goals
+
+Pulse-Commerce is designed to help you learn:
+
+- Distributed systems  
+- Microservices architecture  
+- Cloud deployment  
+- CI/CD pipelines  
+- Observability and monitoring  
+- Event-driven design  
+- Payment systems  
+- Performance optimization  
+
+---
+
+## 🗺 Roadmap
+
+- [ ] Monolith setup  
+- [ ] User & product services  
+- [ ] Order service  
+- [ ] Payment integration  
+- [ ] Elasticsearch search  
+- [ ] Redis caching  
+- [ ] Messaging with RabbitMQ / Kafka  
+- [ ] Dockerization  
+- [ ] Kubernetes deployment  
+- [ ] GitOps with ArgoCD  
+
+---
+
+## 🤝 Contributing
+
+This is a personal learning and portfolio project, but suggestions and improvements are welcome.
+
+Feel free to open issues or submit pull requests.
+
+---
+
+## 📜 License
+
+MIT License (or choose your preferred license).
+
+---
+
+## 👨‍💻 Author
+
+Built by **Taiwo (Damola) Adediran**  
+Full-Stack Engineer | Cloud & Microservices Enthusiast  
+
+---
+
+
