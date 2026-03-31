@@ -1,4 +1,38 @@
 package com.damoladev.pulsecommerce.model;
 
-public class Product {
+import com.damoladev.pulsecommerce.enums.ProductStatus;
+import jakarta.persistence.*;
+import org.hibernate.annotations.AnyDiscriminatorImplicitValues;
+
+import java.util.HashSet;
+import java.util.Set;
+
+public class Product extends AuditableEntity{
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String productId;
+
+    private String name;
+
+    private String description;
+
+    private String slug;
+
+    private String brand;
+
+    private boolean active = true;
+
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
+
+    @OneToOne
+    @JoinColumn(name = "categoryId")
+    private Category category;
+
+    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
+    private Set<ProductVariant> productVariants = new HashSet<>();
+
+    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
+    private Set<ProductImage> productImages = new HashSet<>();
+
 }
