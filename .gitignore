@@ -1,0 +1,60 @@
+# ========================
+# BACKEND (Spring Boot - Pulse Commerce)
+# ========================
+backend/pulsecommerce/HELP.md
+backend/pulsecommerce/target/
+backend/pulsecommerce/.mvn/wrapper/maven-wrapper.jar
+!backend/pulsecommerce/**/src/main/**/target/
+!backend/pulsecommerce/**/src/test/**/target/
+
+### STS ###
+backend/pulsecommerce/.apt_generated
+backend/pulsecommerce/.classpath
+backend/pulsecommerce/.factorypath
+backend/pulsecommerce/.project
+backend/pulsecommerce/.settings
+backend/pulsecommerce/.springBeans
+backend/pulsecommerce/.sts4-cache
+
+### IntelliJ IDEA ###
+backend/pulsecommerce/.idea
+backend/pulsecommerce/*.iws
+backend/pulsecommerce/*.iml
+backend/pulsecommerce/*.ipr
+
+### NetBeans ###
+backend/pulsecommerce/nbproject/private/
+backend/pulsecommerce/nbbuild/
+backend/pulsecommerce/dist/
+backend/pulsecommerce/nbdist/
+backend/pulsecommerce/.nb-gradle/
+backend/pulsecommerce/build/
+!backend/pulsecommerce/**/src/main/**/build/
+!backend/pulsecommerce/**/src/test/**/build/
+
+### VS Code ###
+backend/pulsecommerce/.vscode/
+
+### Environment ###
+backend/pulsecommerce/.env
+backend/pulsecommerce/*.env
+
+# ========================
+# FRONTEND (Next.js)
+# ========================
+frontend/.next/
+frontend/out/
+frontend/node_modules/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/.vscode/
+
+# ========================
+# GENERAL
+# ========================
+.DS_Store
+Thumbs.db
+*.log
