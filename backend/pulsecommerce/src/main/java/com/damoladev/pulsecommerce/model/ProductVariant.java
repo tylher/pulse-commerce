@@ -25,9 +25,15 @@ public class ProductVariant {
     private boolean inStock;
 
     @OneToMany(mappedBy = "variant",cascade = CascadeType.ALL)
-    private Set<VariantOption> variantOption = new HashSet<>();
+    private Set<VariantOption> variantOptions = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
+
+
+    public void addOption(VariantOption option){
+        option.setVariant(this);
+        variantOptions.add(option);
+    }
 }

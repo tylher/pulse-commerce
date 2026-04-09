@@ -3,3 +3,8 @@ server:
 spring:
   application:
     name: pulsecommerce
+
+cloudinary:
+  cloud-name: dwnoizvpx
+  api-key: 357526338678882
+  api-secret: Ii9a9S4u5jpnN8PK1R9pyYH_TsU
