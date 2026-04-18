@@ -45,4 +45,7 @@ public class Product extends AuditableEntity{
     @OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
     private List<ProductImage> productImages = new ArrayList<>();
 
+    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
+    private Set<Specification> productSpecifications = new HashSet<>();
+
 }

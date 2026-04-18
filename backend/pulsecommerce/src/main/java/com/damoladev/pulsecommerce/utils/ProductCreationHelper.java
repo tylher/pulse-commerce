@@ -1,9 +1,6 @@
 package com.damoladev.pulsecommerce.utils;
 
-import com.damoladev.pulsecommerce.dto.CreateProductRequestDto;
-import com.damoladev.pulsecommerce.dto.CreateProductVariantRequest;
-import com.damoladev.pulsecommerce.dto.CreateVariantOptionRequest;
-import com.damoladev.pulsecommerce.dto.ProductResponseDto;
+import com.damoladev.pulsecommerce.dto.*;
 import com.damoladev.pulsecommerce.enums.ProductStatus;
 import com.damoladev.pulsecommerce.exception.DuplicateProductException;
 import com.damoladev.pulsecommerce.exception.ImageValidationException;
@@ -13,6 +10,7 @@ import com.damoladev.pulsecommerce.model.*;
 import com.damoladev.pulsecommerce.repository.CategoryRepository;
 import com.damoladev.pulsecommerce.repository.ProductRepository;
 import com.damoladev.pulsecommerce.service.productImages.ProductImageService;
+import com.damoladev.pulsecommerce.specifications.ProductSpecification;
 import com.damoladev.pulsecommerce.validator.ImageValidator;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
@@ -68,6 +66,14 @@ public class ProductCreationHelper {
             for (ProductVariant variant : variants){
                 variant.setProduct(newProduct);
                 newProduct.getProductVariants().add(variant);
+            }
+
+            for(CreateProductSpecificationRequest spec:dto.specifications()){
+                Specification specification = new Specification();
+                specification.setKey(spec.key());
+                specification.setValue(spec.value());
+                specification.setProduct(newProduct);
+                newProduct.getProductSpecifications().add(specification);
             }
 
 
