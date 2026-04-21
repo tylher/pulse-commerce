@@ -7,7 +7,20 @@ spring:
     import:
       - optional:classpath:env.properties
 
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${POSTGRES_DB_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: ${DDL_AUTO}
+
+
 cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME}
   api-key: ${CLOUDINARY_API_KEY}
-  api-secret: ${CLOUDINARY_CLOUD_NAME}
+  api-secret: ${CLOUDINARY_API_SECRET}
