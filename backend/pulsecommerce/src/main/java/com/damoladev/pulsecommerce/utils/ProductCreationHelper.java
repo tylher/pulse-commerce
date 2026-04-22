@@ -185,7 +185,7 @@ public class ProductCreationHelper {
         }
 
         Optional<Product> inActiveProduct = productRepository
-                .findByByNameIgnoreCaseAndStatus(name, ProductStatus.ARCHIVED);
+                .findByNameIgnoreCaseAndStatus(name, ProductStatus.ARCHIVED);
 
         if (inActiveProduct.isPresent()) {
             throw new InactiveProductException(

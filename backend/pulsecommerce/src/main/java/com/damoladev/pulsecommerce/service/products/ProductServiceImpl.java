@@ -58,7 +58,7 @@ public class ProductServiceImpl implements ProductService{
         Page<ProductResponseDto> products = productRepository.findAll(spec,pageable).map(
                 ProductMapper::toProductResponseDto
         );
-        return new ApiResponseDto(true, "Products fetched successfully",products);
+        return new ApiResponseDto(true, "Products fetched successfully",products.getContent());
     }
 
 

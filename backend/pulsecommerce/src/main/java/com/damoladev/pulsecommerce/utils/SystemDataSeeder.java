@@ -22,6 +22,7 @@ public class SystemDataSeeder implements ApplicationRunner {
         if(!exists){
             Category category = new Category();
             category.setSystem(true);
+            category.setSlug("uncategorized");
             category.setName("Uncategorized");
             category.setStatus(ProductStatus.ACTIVE);
             categoryRepository.save(category);

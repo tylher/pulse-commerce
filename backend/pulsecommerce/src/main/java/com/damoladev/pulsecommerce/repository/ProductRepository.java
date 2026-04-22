@@ -16,7 +16,7 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product,String>, JpaSpecificationExecutor<Product> {
     boolean existsByNameIgnoreCaseAndStatus(@NotBlank(message = "name cannot be blank") String name, ProductStatus productStatus);
 
-    Optional<Product> findByByNameIgnoreCaseAndStatus(@NotBlank(message = "name cannot be blank") String name, ProductStatus productStatus);
+    Optional<Product> findByNameIgnoreCaseAndStatus(@NotBlank(message = "name cannot be blank") String name, ProductStatus productStatus);
 
     boolean existsBySlug(String uniqueSlug);
 
