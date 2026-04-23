@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.io.IOException;
 import java.util.*;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ProductImageServiceImpl implements ProductImageService{
@@ -37,8 +39,9 @@ public class ProductImageServiceImpl implements ProductImageService{
             MultipartFile file = images.get(i);
             imageValidator.validate(file);
             String filename = FilenameSanitizer.sanitize(file.getOriginalFilename());
+            log.info(filename);
             Map result = storageService.uploadFile(file,"pulse-commerce/products",filename);
-            String url = result.get("secured_url").toString();
+            String url = result.get("secure_url").toString();
             String publicId = result.get("public_id").toString();
 
 

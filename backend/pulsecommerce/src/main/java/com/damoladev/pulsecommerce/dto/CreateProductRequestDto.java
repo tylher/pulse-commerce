@@ -20,7 +20,8 @@ public record CreateProductRequestDto(
         @NotEmpty(message = "Product should have at least on variant")
         @Size(max = 10, message = "Cannot exceed 10 variants")
         List<CreateProductVariantRequest> productVariants,
-        @NotEmpty
+        @NotNull(message = "Primary Image index cannot be null")
+        @PositiveOrZero(message = "Primary Image index must be positive")
         Integer primaryImageIndex
 ) {
 }

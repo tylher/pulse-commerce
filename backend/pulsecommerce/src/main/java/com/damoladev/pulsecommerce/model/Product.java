@@ -4,6 +4,7 @@ import com.damoladev.pulsecommerce.enums.ProductStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.AnyDiscriminatorImplicitValues;
 
@@ -13,8 +14,10 @@ import java.util.List;
 import java.util.Set;
 
 
+
 @Entity
 @Data
+@EqualsAndHashCode(exclude = {"productVariants","productImages","productSpecifications"}, callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product extends AuditableEntity{

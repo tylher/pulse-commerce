@@ -12,6 +12,7 @@ import com.damoladev.pulsecommerce.specifications.ProductSpecification;
 import com.damoladev.pulsecommerce.utils.ProductCreationHelper;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService{
@@ -40,6 +42,7 @@ public class ProductServiceImpl implements ProductService{
             try{
                 responses.add(productCreationHelper.createProduct(dtos.get(i),imageGroups.get(i)));
             }catch (Exception ex){
+                log.info(ex.getMessage());
                 errors.add("Product " + i + " (" + dtos.get(i).name() + "): " + ex.getMessage());
             }
         }

@@ -95,6 +95,7 @@ public class ProductCreationHelper {
                 | ImageValidationException | InactiveProductException ex) {
             throw ex;
         }  catch (IOException ex) {
+            log.error(ex.getMessage());
             throw new ServiceException("Image upload failed", ex);
         } catch (DataAccessException ex) {
             throw new ServiceException("Database error during product creation", ex);
