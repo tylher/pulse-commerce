@@ -40,10 +40,10 @@ public class ProductServiceTest {
                     mockCreateProductResponseDto.get(i)
             );
         }
-        ApiResponseDto responseDto = productService.createProducts(mockProductsRequest,mockImageGroup);
+        ApiResponseDto<List<ProductResponseDto>> responseDto = productService.createProducts(mockProductsRequest,mockImageGroup);
 
         assertTrue(responseDto.isStatus());
-        List<ProductResponseDto> data = (List<ProductResponseDto>) responseDto.getData();
+        List<ProductResponseDto> data =  responseDto.getData();
         assertEquals(3,data.size());
         assertEquals("prod-uuid-002", data.get(1).getId());
 

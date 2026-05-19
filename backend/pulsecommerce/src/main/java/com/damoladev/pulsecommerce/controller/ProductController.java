@@ -10,6 +10,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -29,6 +30,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("api/products")
 @RequiredArgsConstructor
+@Slf4j
 public class ProductController {
     private final ObjectMapper objectMapper;
     private final Validator validator;
@@ -36,13 +38,17 @@ public class ProductController {
 
     @PostMapping(value = "/batch", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponseDto> createProducts(HttpServletRequest request){
+        long requestStart = System.currentTimeMillis();
+        log.info("=== Batch product request received ===");
+
         StandardMultipartHttpServletRequest multipart = (StandardMultipartHttpServletRequest) request;
         List<CreateProductRequestDto> productRequestDTOs = new ArrayList<>();
-        List<List<MultipartFile>> productImages= new ArrayList<>();
+        List<List<MultipartFile>> productImages = new ArrayList<>();
 
-        int index= 0;
-        while (multipart.getParameterMap().containsKey("product["+index+"].data")){
-            String json = multipart.getParameter("product["+index+"].data");
+        long parseStart = System.currentTimeMillis();
+        int index = 0;
+        while (multipart.getParameterMap().containsKey("product[" + index + "].data")) {
+            String json = multipart.getParameter("product[" + index + "].data");
             CreateProductRequestDto dto = objectMapper.readValue(json, CreateProductRequestDto.class);
 
             Set<ConstraintViolation<CreateProductRequestDto>> violations = validator.validate(dto);
@@ -50,19 +56,27 @@ public class ProductController {
                 throw new ConstraintViolationException("Product " + index + " invalid", violations);
             }
 
-            List<MultipartFile> imagesDTO = multipart.getFiles("product["+index+"].images");
+            List<MultipartFile> imagesDTO = multipart.getFiles("product[" + index + "].images");
+            log.info("Product[{}] parsed — name: {}, images: {}", index, dto.name(), imagesDTO.size());
 
             productRequestDTOs.add(dto);
             productImages.add(imagesDTO);
             index++;
         }
+        log.info("Parsing {} products took {}ms", productRequestDTOs.size(), System.currentTimeMillis() - parseStart);
 
-        if (productRequestDTOs.isEmpty()){
+        if (productRequestDTOs.isEmpty()) {
             throw new ValidationException("No products provided");
         }
 
-        return new ResponseEntity<>(productService.createProducts(productRequestDTOs,productImages), HttpStatus.CREATED);
+        long serviceStart = System.currentTimeMillis();
+        ApiResponseDto response = productService.createProducts(productRequestDTOs, productImages);
+        log.info("productService.createProducts took {}ms", System.currentTimeMillis() - serviceStart);
+
+        log.info("=== Total request time: {}ms ===", System.currentTimeMillis() - requestStart);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
 
     @GetMapping
     public ResponseEntity<ApiResponseDto> getProducts(@RequestParam(required = false) String categoryId,

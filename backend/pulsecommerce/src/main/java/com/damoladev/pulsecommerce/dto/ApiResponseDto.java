@@ -6,14 +6,14 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ApiResponseDto {
+public class ApiResponseDto<T> {
     private boolean status;
     private String message;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Object data;
+    private T data;
 
 
-    ApiResponseDto(boolean status,String message){
+    public ApiResponseDto(boolean status,String message){
         this.status = status;
         this.message = message;
     }

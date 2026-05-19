@@ -20,6 +20,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -39,72 +41,80 @@ public class ProductCreationHelper {
 
     @Transactional
     public ProductResponseDto createProduct(CreateProductRequestDto dto, List<MultipartFile> files){
-        try{
-            //validate user as admin
-            //check if the category exist, if not add it to uncategorized
+           long start = System.currentTimeMillis();
+            log.info("createProduct started for: {}", dto.name());
 
-            Category category  = categoryRepository.findById(dto.categoryId()).orElseThrow(
-                    ()-> new ValidationException("Category with id, %s, not found".formatted(dto.categoryId()))
-            );
+            try {
+                long categoryStart = System.currentTimeMillis();
+                Category category = categoryRepository.findById(dto.categoryId()).orElseThrow(
+                        () -> new ValidationException("Category with id, %s, not found".formatted(dto.categoryId()))
+                );
+                log.info("Category lookup took {}ms", System.currentTimeMillis() - categoryStart);
 
-            //check if the name already exist
-            validateProductName(dto.name());
+                long nameValidationStart = System.currentTimeMillis();
+                validateProductName(dto.name());
+                log.info("Name validation took {}ms", System.currentTimeMillis() - nameValidationStart);
 
-            // populate the product object
-            Product newProduct = new Product();
-            newProduct.setName(dto.name());
-            newProduct.setBrand(dto.brand());
-            newProduct.setDescription(dto.description());
-            newProduct.setStatus(ProductStatus.DRAFT);
-            newProduct.setCategory(category);
-            newProduct.setActive(false);
-            String productSlug = slugHelper.generateUniqueSlug(dto.name());
-            newProduct.setSlug(productSlug);
+                long slugStart = System.currentTimeMillis();
+                String productSlug = slugHelper.generateUniqueSlug(dto.name());
+                log.info("Slug generation took {}ms", System.currentTimeMillis() - slugStart);
 
-            Set<ProductVariant> variants = createAndValidateProductVariants(dto.productVariants(),dto.name(),category.getName());
+                Product newProduct = new Product();
+                newProduct.setName(dto.name());
+                newProduct.setBrand(dto.brand());
+                newProduct.setDescription(dto.description());
+                newProduct.setStatus(ProductStatus.DRAFT);
+                newProduct.setCategory(category);
+                newProduct.setActive(false);
+                newProduct.setSlug(productSlug);
 
-            for (ProductVariant variant : variants){
-                variant.setProduct(newProduct);
-                newProduct.getProductVariants().add(variant);
+                long variantStart = System.currentTimeMillis();
+                Set<ProductVariant> variants = createAndValidateProductVariants(dto.productVariants(), dto.name(), category.getName());
+                log.info("Variant creation took {}ms", System.currentTimeMillis() - variantStart);
+
+                for (ProductVariant variant : variants) {
+                    variant.setProduct(newProduct);
+                    newProduct.getProductVariants().add(variant);
+                }
+
+                for (CreateProductSpecificationRequest spec : dto.specifications()) {
+                    Specification specification = new Specification();
+                    specification.setKey(spec.key());
+                    specification.setValue(spec.value());
+                    specification.setProduct(newProduct);
+                    newProduct.getProductSpecifications().add(specification);
+                }
+
+                long saveStart = System.currentTimeMillis();
+                Product savedProduct = productRepository.save(newProduct);
+                log.info("Product DB save took {}ms", System.currentTimeMillis() - saveStart);
+
+                long asyncStart = System.currentTimeMillis();
+                // register the async call to fire AFTER transaction commits
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        log.info("Transaction committed, firing image upload for product: {}", savedProduct.getProductId());
+                        productImageService.uploadAndAttachImages(savedProduct.getProductId(), files, dto.primaryImageIndex());
+                    }
+                });
+                log.info("uploadAndAttachImages fired (async) in {}ms", System.currentTimeMillis() - asyncStart);
+
+                log.info("createProduct total time (excluding async image upload): {}ms", System.currentTimeMillis() - start);
+                return ProductMapper.toProductResponseDto(savedProduct);
+
+
+            } catch (ValidationException | DuplicateProductException
+                     | ImageValidationException | InactiveProductException ex) {
+                throw ex;
+            } catch (DataAccessException ex) {
+                throw new ServiceException("Database error during product creation", ex);
+            } catch (Exception ex) {
+                log.error("Unexpected error creating product: {}", dto.name(), ex);
+                throw new ServiceException("Unexpected error", ex);
             }
 
-            for(CreateProductSpecificationRequest spec:dto.specifications()){
-                Specification specification = new Specification();
-                specification.setKey(spec.key());
-                specification.setValue(spec.value());
-                specification.setProduct(newProduct);
-                newProduct.getProductSpecifications().add(specification);
-            }
-
-
-            List<ProductImage> images = productImageService.uploadImages(files,dto.primaryImageIndex());
-
-
-            for (ProductImage image : images){
-                image.setProduct(newProduct);
-            }
-
-            newProduct.setProductImages(images);
-            Product savedProduct = productRepository.save(newProduct);
-
-
-            return ProductMapper.toProductResponseDto(savedProduct);
-
-
-        }catch (ValidationException | DuplicateProductException
-                | ImageValidationException | InactiveProductException ex) {
-            throw ex;
-        }  catch (IOException ex) {
-            log.error(ex.getMessage());
-            throw new ServiceException("Image upload failed", ex);
-        } catch (DataAccessException ex) {
-            throw new ServiceException("Database error during product creation", ex);
-        } catch (Exception ex) {
-            log.error("Unexpected error creating product: {}", dto.name(), ex);
-            throw new ServiceException("Unexpected error", ex);
         }
-
-    }
 
     private void validateVariants(List<CreateProductVariantRequest> variants){
         if (variants == null || variants.isEmpty()) {
